@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radix Sort Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #a78bfa;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(59, 130, 246, 0.6);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 20px;
+            color: white;
+        }
+
+        .btn-play {
+            background: linear-gradient(to right, #10b981, #059669);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-step {
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-reset {
+            background: linear-gradient(to right, #ef4444, #dc2626);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .control-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .speed-control input[type="range"] {
+            width: 120px;
+        }
+
+        .progress-section {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            transition: width 0.3s;
+            border-radius: 10px;
+        }
+
+        .description-box {
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .description-box h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .description-box p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .array-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .array-container h3 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.3rem;
+        }
+
+        .array-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .array-item {
+            min-width: 80px;
+            padding: 25px 20px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.5s;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .array-item.normal {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        }
+
+        .array-item.highlighted {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1f2937;
+            transform: scale(1.25);
+            border-color: #fbbf24;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1.25); }
+            50% { transform: scale(1.3); }
+        }
+
+        .buckets-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .buckets-container h3 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.3rem;
+        }
+
+        .buckets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .bucket {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            min-height: 120px;
+            transition: all 0.5s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .bucket.active {
+            background: rgba(251, 191, 36, 0.3);
+            border-color: #fbbf24;
+            transform: scale(1.05);
+        }
+
+        .bucket-label {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .bucket-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .bucket-item {
+            background: linear-gradient(to right, #14b8a6, #06b6d4);
+            color: #1f2937;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+
+        .bucket-item:hover {
+            transform: scale(1.05);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(67, 56, 202, 0.5), rgba(139, 92, 246, 0.5));
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-box h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .info-section h4 {
+            color: #93c5fd;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .info-section ul {
+            list-style: none;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .info-section li {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .array-item {
+                min-width: 60px;
+                padding: 15px 10px;
+                font-size: 1.2rem;
+            }
+
+            .buckets-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Radix Sort Visualizer</h1>
+        <p class="subtitle">Watch every step of the sorting process in slow motion</p>
+
+        <div class="input-section">
+            <input type="text" id="arrayInput" placeholder="Enter numbers (e.g., 170, 45, 75, 90)" value="170, 45, 75, 90, 802, 24, 2, 66">
+            <button class="btn btn-primary" onclick="setArray()">Set Array</button>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn btn-step" onclick="prevStep()" id="prevBtn">◀</button>
+            <button class="control-btn btn-play" onclick="togglePlay()" id="playBtn">▶</button>
+            <button class="control-btn btn-step" onclick="nextStep()" id="nextBtn">▶</button>
+            <button class="control-btn btn-reset" onclick="reset()">↻</button>
+            <div class="speed-control">
+                <span>Speed:</span>
+                <input type="range" min="500" max="3000" step="250" value="1500" id="speedSlider" oninput="updateSpeed()">
+                <span id="speedLabel">1.5s</span>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-info">
+                <span id="stepInfo">Step 1 of 1</span>
+                <span id="percentInfo">0% Complete</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="description-box" id="descriptionBox">
+            <h2 id="descTitle">🎯 Starting Radix Sort</h2>
+            <p id="descText">We will sort these numbers digit by digit, starting from the rightmost digit.</p>
+        </div>
+
+        <div class="array-container">
+            <h3>Current Array State</h3>
+            <div class="array-display" id="arrayDisplay"></div>
+        </div>
+
+        <div class="buckets-container" id="bucketsContainer" class="hidden">
+            <h3>Digit Buckets (0 - 9)</h3>
+            <div class="buckets-grid" id="bucketsGrid"></div>
+        </div>
+
+        <div class="info-box">
+            <h3>📚 How Radix Sort Works</h3>
+            <div class="info-grid">
+                <div class="info-section">
+                    <h4>Algorithm Steps:</h4>
+                    <ul>
+                        <li>• Find the maximum number to determine digit count</li>
+                        <li>• Start from the least significant digit (rightmost)</li>
+                        <li>• Distribute numbers into buckets 0-9 based on current digit</li>
+                        <li>• Collect numbers from buckets in order</li>
+                        <li>• Repeat for each digit position moving left</li>
+                    </ul>
+                </div>
+                <div class="info-section">
+                    <h4>Complexity:</h4>
+                    <ul>
+                        <li>• <strong>Time:</strong> O(d × (n + k))</li>
+                        <li>• d = number of digits</li>
+                        <li>• n = number of elements</li>
+                        <li>• k = range of digit values (0-9)</li>
+                        <li>• <strong>Space:</strong> O(n + k)</li>
+                        <li>• <strong>Stable:</strong> Yes ✓</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let array = [170, 45, 75, 90, 802, 24, 2, 66];
+        let steps = [];
+        let currentStep = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        let speed = 1500;
+
+        const phaseColors = {
+            'initial': 'linear-gradient(to right, #3b82f6, #1e40af)',
+            'new-digit': 'linear-gradient(to right, #8b5cf6, #6d28d9)',
+            'distributing': 'linear-gradient(to right, #fbbf24, #f59e0b)',
+            'collected-in-buckets': 'linear-gradient(to right, #10b981, #059669)',
+            'collecting': 'linear-gradient(to right, #14b8a6, #0d9488)',
+            'digit-complete': 'linear-gradient(to right, #6366f1, #4f46e5)',
+            'complete': 'linear-gradient(to right, #ec4899, #db2777)'
+        };
+
+        function getDigit(num, exp) {
+            return Math.floor(num / exp) % 10;
+        }
+
+        function generateSteps(arr) {
+            const stepsArray = [];
+            const workingArray = [...arr];
+            
+            stepsArray.push({
+                array: [...workingArray],
+                exp: 1,
+                buckets: Array(10).fill(null).map(() => []),
+                description: '🎯 Starting Radix Sort',
+                subDescription: 'We will sort these numbers digit by digit, starting from the rightmost digit.',
+                phase: 'initial',
+                highlightedIndices: []
+            });
+
+            const max = Math.max(...workingArray);
+            let digitPosition = 0;
+            const positionNames = ['ones', 'tens', 'hundreds', 'thousands'];
+            
+            for (let exp = 1; Math.floor(max / exp) > 0; exp *= 10) {
+                const positionName = positionNames[digitPosition] || `position ${digitPosition}`;
+                
+                stepsArray.push({
+                    array: [...workingArray],
+                    exp,
+                    buckets: Array(10).fill(null).map(() => []),
+                    description: `📍 Processing ${positionName} place (digit position ${digitPosition})`,
+                    subDescription: `We'll now look at the ${positionName} digit of each number.`,
+                    phase: 'new-digit',
+                    highlightedIndices: []
+                });
+
+                const buckets = Array(10).fill(null).map(() => []);
+                
+                for (let i = 0; i < workingArray.length; i++) {
+                    const digit = getDigit(workingArray[i], exp);
+                    buckets[digit].push(workingArray[i]);
+                    
+                    stepsArray.push({
+                        array: [...workingArray],
+                        exp,
+                        buckets: buckets.map(b => [...b]),
+                        description: `🔍 Examining number ${workingArray[i]}`,
+                        subDescription: `The ${positionName} digit is ${digit}, so ${workingArray[i]} goes into bucket ${digit}.`,
+                        phase: 'distributing',
+                        highlightedIndices: [i],
+                        currentBucket: digit
+                    });
+                }
+
+                stepsArray.push({
+                    array: [...workingArray],
+                    exp,
+                    buckets: buckets.map(b => [...b]),
+                    description: `✅ All numbers distributed into buckets`,
+                    subDescription: 'Now we collect them back in order from bucket 0 to bucket 9.',
+                    phase: 'collected-in-buckets',
+                    highlightedIndices: []
+                });
+
+                const newArray = [];
+                for (let i = 0; i < 10; i++) {
+                    if (buckets[i].length > 0) {
+                        const startIdx = newArray.length;
+                        stepsArray.push({
+                            array: [...newArray, ...buckets[i], ...workingArray.slice(newArray.length + buckets[i].length)],
+                            exp,
+                            buckets: buckets.map(b => [...b]),
+                            description: `📥 Collecting from bucket ${i}`,
+                            subDescription: `Adding ${buckets[i].join(', ')} to the result array.`,
+                            phase: 'collecting',
+                            highlightedIndices: Array.from({length: buckets[i].length}, (_, idx) => startIdx + idx),
+                            currentBucket: i
+                        });
+                    }
+                    newArray.push(...buckets[i]);
+                }
+
+                for (let i = 0; i < workingArray.length; i++) {
+                    workingArray[i] = newArray[i];
+                }
+
+                stepsArray.push({
+                    array: [...workingArray],
+                    exp,
+                    buckets: Array(10).fill(null).map(() => []),
+                    description: `✨ Sorted by ${positionName} place`,
+                    subDescription: 'The array is now organized by this digit. Moving to the next digit...',
+                    phase: 'digit-complete',
+                    highlightedIndices: []
+                });
+
+                digitPosition++;
+            }
+            
+            stepsArray.push({
+                array: [...workingArray],
+                exp: 0,
+                buckets: Array(10).fill(null).map(() => []),
+                description: '🎉 Sorting Complete!',
+                subDescription: 'All digits have been processed. The array is now fully sorted.',
+                phase: 'complete',
+                highlightedIndices: Array.from({length: workingArray.length}, (_, i) => i)
+            });
+            
+            return stepsArray;
+        }
+
+        function setArray() {
+            const input = document.getElementById('arrayInput').value;
+            try {
+                const newArray = input.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n >= 0);
+                if (newArray.length > 0 && newArray.length <= 15) {
+                    array = newArray;
+                    steps = generateSteps(array);
+                    currentStep = 0;
+                    stopPlay();
+                    render();
+                } else {
+                    alert('Please enter 1-15 valid positive numbers');
+                }
+            } catch (e) {
+                alert('Please enter valid numbers separated by commas');
+            }
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const playBtn = document.getElementById('playBtn');
+            playBtn.innerHTML = isPlaying ? '⏸' : '▶';
+            
+            if (isPlaying) {
+                playInterval = setInterval(() => {
+                    if (currentStep < steps.length - 1) {
+                        currentStep++;
+                        render();
+                    } else {
+                        stopPlay();
+                    }
+                }, speed);
+            } else {
+                stopPlay();
+            }
+        }
+
+        function stopPlay() {
+            isPlaying = false;
+            if (playInterval) {
+                clearInterval(playInterval);
+                playInterval = null;
+            }
+            document.getElementById('playBtn').innerHTML = '▶';
+        }
+
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                render();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                render();
+            }
+        }
+
+        function reset() {
+            stopPlay();
+            currentStep = 0;
+            render();
+        }
+
+        function updateSpeed() {
+            const slider = document.getElementById('speedSlider');
+            speed = parseInt(slider.value);
+            document.getElementById('speedLabel').textContent = (speed / 1000).toFixed(1) + 's';
+            
+            if (isPlaying) {
+                stopPlay();
+                togglePlay();
+            }
+        }
+
+        function render() {
+            const step = steps[currentStep];
+            if (!step) return;
+
+            // Update progress
+            document.getElementById('stepInfo').textContent = `Step ${currentStep + 1} of ${steps.length}`;
+            const percent = Math.round((currentStep / (steps.length - 1)) * 100);
+            document.getElementById('percentInfo').textContent = `${percent}% Complete`;
+            document.getElementById('progressFill').style.width = `${percent}%`;
+
+            // Update description
+            const descBox = document.getElementById('descriptionBox');
+            descBox.style.background = phaseColors[step.phase] || phaseColors.initial;
+            document.getElementById('descTitle').textContent = step.description;
+            document.getElementById('descText').textContent = step.subDescription;
+
+            // Update array display
+            const arrayDisplay = document.getElementById('arrayDisplay');
+            arrayDisplay.innerHTML = '';
+            step.array.forEach((num, idx) => {
+                const div = document.createElement('div');
+                div.className = 'array-item';
+                div.classList.add(step.highlightedIndices.includes(idx) ? 'highlighted' : 'normal');
+                div.textContent = num;
+                arrayDisplay.appendChild(div);
+            });
+
+            // Update buckets
+            const bucketsContainer = document.getElementById('bucketsContainer');
+            const bucketsGrid = document.getElementById('bucketsGrid');
+            
+            if (step.buckets.some(b => b.length > 0)) {
+                bucketsContainer.classList.remove('hidden');
+                bucketsGrid.innerHTML = '';
+                
+                step.buckets.forEach((bucket, idx) => {
+                    const bucketDiv = document.createElement('div');
+                    bucketDiv.className = 'bucket';
+                    if (step.currentBucket === idx) {
+                        bucketDiv.classList.add('active');
+                    }
+                    
+                    const label = document.createElement('div');
+                    label.className = 'bucket-label';
+                    label.textContent = idx;
+                    bucketDiv.appendChild(label);
+                    
+                    const itemsDiv = document.createElement('div');
+                    itemsDiv.className = 'bucket-items';
+                    
+                    bucket.forEach(val => {
+                        const item = document.createElement('div');
+                        item.className = 'bucket-item';
+                        item.textContent = val;
+                        itemsDiv.appendChild(item);
+                    });
+                    
+                    bucketDiv.appendChild(itemsDiv);
+                    bucketsGrid.appendChild(bucketDiv);
+                });
+            } else {
+                bucketsContainer.classList.add('hidden');
+            }
+
+            // Update button states
+            document.getElementById('prevBtn').disabled = currentStep === 0;
+            document.getElementById('nextBtn').disabled = currentStep === steps.length - 1;
+        }
+
+        // Initialize
+        steps = generateSteps(array);
+        render();
+    </script>
+</body>
+</html>
